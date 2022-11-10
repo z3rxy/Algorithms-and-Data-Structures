@@ -7,17 +7,14 @@ public class Main {
         FileWriter cout = new FileWriter("output.txt");
         Scanner cin = new Scanner(fileIn);
 
-        byte size = cin.nextByte(), counter = 2, now;
-        boolean indicator = false;
+        byte size = cin.nextByte(), counter = 2, index = 0;
+        boolean indicator = false, allChecked = false;
 
         if(size == 1) { cout.write(String.valueOf(1)); cout.close(); return; }
 
         byte[] result = new byte[size];
         boolean[] checked = new boolean[size];
         byte[][] matrix = new byte[size][size];
-
-        Queue <Byte> checking = new LinkedList<>();
-        Queue <Byte> newChecking = new LinkedList<>();
 
         for(byte y = 0; y < size; y++){
             for(byte x = 0; x < size; x++){
@@ -27,44 +24,54 @@ public class Main {
             result[y] = -1;
         }
 
-        for(byte y = 0; y < size; y++){
-            for(byte x = 0; x < size; x++){
-                if(matrix[y][x] != 0){
-                    checked[x] = true;
-                    checking.add(x);
-                    result[x] = counter;
-                    counter++;
-                    indicator = true;
-                }
-            }
-            if(indicator){
-                checked[y] = true;
-                result[y] = 1;
-                break;
-            }
-        }
-
-        while(!checking.isEmpty()){
-            while(!checking.isEmpty()){
-                now = checking.poll();
-                for(byte x = 0; x < size; x++){
-                    if(matrix[now][x] != 0 && !checked[x]){
-                        checked[x] = true;
-                        newChecking.add(x);
-                        result[x] = counter;
-                        counter++;
+        while(!allChecked) {
+            if(index == 0) {
+                for (byte y = 0; y < size; y++) {
+                    for (byte x = 0; x < size; x++) {
+                        if (matrix[y][x] != 0) {
+                            checked[x] = true;
+                            result[x] = counter;
+                            counter++;
+                            indicator = true;
+                        }
+                    }
+                    if (indicator) {
+                        checked[y] = true;
+                        result[y] = 1;
+                        break;
                     }
                 }
             }
-            while(!newChecking.isEmpty()) checking.add(newChecking.poll());
-        }
-
-        for(byte x = 0; x < size; x++){
-            if(!checked[x]){
-                result[x] = counter;
-                counter++;
-                checked[x] = true;
+            else {
+                for (byte y = 0; y < size; y++) {
+                    for (byte x = 0; x < size; x++) {
+                        if (matrix[y][x] != 0) {
+                            if(!checked[y]) {
+                                checked[y] = true;
+                                result[y] = counter;
+                                counter++;
+                            }
+                            if(!checked[x]){
+                                checked[x] = true;
+                                result[x] = counter;
+                                counter++;
+                                indicator = true;
+                            }
+                        }
+                    }
+                    if (indicator) {
+                        break;
+                    }
+                }
             }
+
+            for(byte i = 0; i < checked.length; i++){
+                if(!checked[i]) break;
+                else if(i == checked.length - 1) allChecked = true;
+            }
+
+            indicator = false;
+            index = 1;
         }
 
         for(byte element : result){
